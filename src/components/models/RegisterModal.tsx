@@ -6,7 +6,7 @@ import { useSetRecoilState } from "recoil";
 import { auth } from "@/firebase/firebase";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
-
+import { toast } from "react-toastify";
 type Props = {};
 
 function RegisterModal({}: Props) {
@@ -35,6 +35,11 @@ function RegisterModal({}: Props) {
       if (!newUser) {
         return;
       }
+      toast.success("Registered successfully", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "dark",
+      });
       router.push("/");
       setInputs({ email: "", name: "", password: "" });
     } catch (error: any) {
@@ -44,10 +49,13 @@ function RegisterModal({}: Props) {
 
   useEffect(() => {
     if (error) {
-      alert(error);
+      toast.error(error.message, {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "dark",
+      });
     }
   }, [error]);
-
   return (
     <form className="space-y-6 px-6 py-4" onSubmit={handleSubmit}>
       <h3 className="text-xl font-medium text-white">SignUp to leetCode</h3>

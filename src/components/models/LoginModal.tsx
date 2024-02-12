@@ -8,8 +8,7 @@ import {
 } from "react-firebase-hooks/auth";
 import { auth } from "@/firebase/firebase";
 import { useRouter } from "next/navigation";
-import { getAuth, signInWithEmailAndPassword, signOut } from "firebase/auth";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { toast } from "react-toastify";
 type Props = {};
 
 function LoginModal({}: Props) {
@@ -30,7 +29,7 @@ function LoginModal({}: Props) {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!inputs.email && !inputs.password) return alert("please fill");
+    if (!inputs.email && !inputs.password) return toast.error("please fill");
     try {
       const newUser = await signInWithEmailAndPassword(
         inputs.email,
@@ -39,19 +38,31 @@ function LoginModal({}: Props) {
       if (!newUser) {
         return;
       }
+      toast.success("Login successfull", {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "dark",
+      });
       router.push("/");
       setInputs({ email: "", password: "" });
     } catch (error: any) {
-      console.log(error);
+      toast.error(error.message, {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "dark",
+      });
     }
   };
 
   useEffect(() => {
     if (error) {
-      alert(error);
+      toast.error(error.message, {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "dark",
+      });
     }
   }, [error]);
-
 
   return (
     <form className="space-y-6 px-6 py-4" onSubmit={handleSubmit}>
