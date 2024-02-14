@@ -4,19 +4,18 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 
 ```bash
 next js
-# or
-typescript
-# or
-firebase
-# or
-tailwind css
-# or
-uiw codemirror
-# or
-recoil
-# or
-fullstack leetcode-clone
 
+typescript
+
+firebase
+
+tailwind css
+
+uiw codemirror
+
+recoil
+
+...
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
