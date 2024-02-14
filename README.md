@@ -5,13 +5,20 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 First, run the development server:
 
 ```bash
-npm run dev
+next js
 # or
-yarn dev
+typescript
 # or
-pnpm dev
+firebase
 # or
-bun dev
+tailwind css
+# or
+uiw codemirror
+# or
+recoil
+# or
+fullstack leetcode-clone
+
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
