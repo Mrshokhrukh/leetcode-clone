@@ -1,17 +1,76 @@
+"use client";
+import React from "react";
 import Navbar from "@/components/navbar/Navbar";
 import WorkSpace from "@/components/workspace/WorkSpace";
-import React from "react";
+import { problems } from "@/utils/problems";
+import { Problem } from "@/utils/problems/types/types";
+import { useEffect, useState } from "react";
 
-type Props = {};
+type Props = {
+  problem: Problem;
+  params: { problemId: string };
+};
 
-const ProblemPage = ({ params }: { params: any }) => {
-  // const { id } = ;
+const ProblemPage: React.FC<Props> = ({ problem, params }) => {
+  const [currentProblem, setProblem] = useState<Problem | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const { problemId } = params;
+      const problemData = problems[problemId];
+      if (!problemData) {
+        // Handle not found
+        return;
+      }
+
+      problemData.handlerFunction = problemData.handlerFunction.toString();
+      setProblem(problemData);
+    };
+
+    fetchData();
+  }, [currentProblem]);
+
   return (
     <div>
       <Navbar problemPage />
-      <WorkSpace />
+      <WorkSpace problem={currentProblem} />
     </div>
   );
 };
+
+export async function getStaticPaths() {
+  const paths = Object.keys(problems).map((key) => ({
+    params: {
+      problemId: key,
+    },
+  }));
+
+  return {
+    paths,
+    fallback: false,
+  };
+}
+
+// export async function getStaticProps({
+//   params,
+// }: {
+//   params: { problemId: string };
+// }) {
+//   const { problemId } = params;
+
+//   const problem = problems[problemId];
+
+//   if (!problem) {
+//     return { notFound: true };
+//   }
+
+//   problem.handlerFunction = problem.handlerFunction.toString();
+
+//   return {
+//     props: {
+//       problem,
+//     },
+//   };
+// }
 
 export default ProblemPage;

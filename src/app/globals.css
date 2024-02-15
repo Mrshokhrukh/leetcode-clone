@@ -20,6 +20,7 @@ html {
   background-color: #282828;
   width: 5px;
 }
+
 ::-webkit-scrollbar-thumb {
   background-color: #494949;
 }

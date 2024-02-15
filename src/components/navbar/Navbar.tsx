@@ -26,10 +26,10 @@ function Navbar({ problemPage }: Props) {
     <nav className="relative flex h-[50px] w-full shrink-0 items-center px-5 bg-dark-layer-1 text-dark-gray-7 ">
       <div
         className={`flex w-full items-center justify-between ${
-          problemPage ? "max-w-[1200px] mx-auto" : ""
+          problemPage ? "max-w-[1200px] mx-auto" : "px-[25px]"
         }`}
       >
-        <Link href="" className="h-[22px] flex-1">
+        <Link href="/" className="h-[22px] flex-1">
           <img src="/logo-full.png" alt="" className="h-full" />
         </Link>
 

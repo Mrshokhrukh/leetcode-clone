@@ -1,11 +1,14 @@
+import { Problem } from "@/utils/problems/types/types";
 import React from "react";
 import { AiFillDislike, AiFillLike } from "react-icons/ai";
 import { BsCheck2Circle } from "react-icons/bs";
 import { TiStarOutline } from "react-icons/ti";
 
-type Props = {};
+type Props = {
+  problem: Problem;
+};
 
-const ProblemDescription = (props: Props) => {
+const ProblemDescription: React.FC<Props> = ({ problem }) => {
   return (
     <div className="bg-dark-layer-1">
       <div className="flex h-11 w-full items-center pt-2 bg-dark-layer-2 text-white overflow-x-hidden">
@@ -21,7 +24,7 @@ const ProblemDescription = (props: Props) => {
           <div className="w-full">
             <div className="flex space-x-4">
               <div className="flex-1 mr-2 text-lg text-white font-medium">
-                1. Two Sum
+                {problem?.title}
               </div>
             </div>
 
@@ -48,80 +51,50 @@ const ProblemDescription = (props: Props) => {
             </div>
             {/* {'problem title para'} */}
             <div className="text-white text-sm">
-              <p className="mt-3">
-                Given an array integers <code>nums</code> and an integer{" "}
-                <code>target</code>, return {"  "}
-                <em>indices of the two numbers such that they add up to </em>
-                <code>target</code>
-              </p>
-              <p className="mt-3">
-                you may assume that each input would have{" "}
-                <strong>exactly one solution</strong> you may not use them twice
-              </p>
-              <p className="mt-3">you can answer in any order</p>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: problem?.problemStatement,
+                }}
+              />
             </div>
             {/* {'examples'} */}
 
-            <div>
-              <p className="font-medium text-white">Example 1: </p>
-              <div className="example-card">
-                <pre>
-                  <strong className="text-white">Input:</strong> nums =
-                  [2,7,11,15], target = 9 <br />
-                  <strong>Output: </strong> [0,1] <br />
-                  <strong>Explanation:</strong> Because nums[0] + num[1] === 9,
-                  we return [0,1]
-                </pre>
-              </div>
-            </div>
-
-            <div>
-              <p className="font-medium text-white">Example 2: </p>
-              <div className="example-card">
-                <pre>
-                  <strong className="text-white">Input:</strong> nums = [3,2,4],
-                  target = 6 <br />
-                  <strong>Output: </strong> [1,2] <br />
-                  <strong>Explanation:</strong> Because nums[1] + num[2] === 6,
-                  we return [1,2]
-                </pre>
-              </div>
-            </div>
-
-            <div>
-              <p className="font-medium text-white">Example 3: </p>
-              <div className="example-card">
-                <pre>
-                  <strong className="text-white">Input:</strong> nums = [3,3],
-                  target = 6 <br />
-                  <strong>Output: </strong> [0,1] <br />
-                </pre>
-              </div>
+            <div className="mt-4">
+              {problem?.examples.map((ex, i) => {
+                return (
+                  <div key={i}>
+                    <p className="font-medium text-white">Example {i + 1}: </p>
+                    {ex.img && (
+                      <img src={ex.img} alt="" className="mt-3 rounded" />
+                    )}
+                    <div className="example-card">
+                      <pre>
+                        <strong className="text-white">Input:</strong>{" "}
+                        {ex.inputText} <br />
+                        <strong>Output: </strong>
+                        {ex.outputText} <br />
+                        {ex.explanation && (
+                          <>
+                            <strong>Explanation:</strong> {ex.explanation}
+                          </>
+                        )}
+                      </pre>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* {Constrains} */}
 
-            <div className="my-5">
+            <div className="my-7">
               <div className="text-white text-sm font-medium">Constrains:</div>
-              <ul className="text-white ml-5 list-disc">
-                <li className="mt-2">
-                  <code>
-                    2 {"<"} nums.length {"<"} 10
-                  </code>
-                </li>
-                <li className="mt-2">
-                  <code>
-                    -10 {"<"} nums[i] {"<"} 10
-                  </code>
-                </li>
-                <li className="mt-2">
-                  <code>
-                    -10 {"<"} target {"<"} 10
-                  </code>
-                </li>
-                <li className="mt-2 text-sm">
-                  <strong>Only one valid answer exists</strong>
-                </li>
+              <ul className="text-white ml-5 list-disc my-4">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: problem?.constraints,
+                  }}
+                />
               </ul>
             </div>
           </div>

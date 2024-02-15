@@ -1,12 +1,18 @@
-import { problems } from "@/mockProblems/problems";
+import { firestore } from "@/firebase/firebase";
+import { DBProblem } from "@/utils/problems/types/types";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { AiFillYoutube } from "react-icons/ai";
 import { BsCheckCircle } from "react-icons/bs";
 
-type Props = {};
+type Props = {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
-const TableProblems = (props: Props) => {
+const TableProblems: React.FC<Props> = ({ setLoading }) => {
+  const problems = useGetProblems(setLoading);
+
   return (
     <tbody className="text-white">
       {problems.map((doc, i) => {
@@ -49,3 +55,32 @@ const TableProblems = (props: Props) => {
 };
 
 export default TableProblems;
+
+function useGetProblems(
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+) {
+  const [probs, setProbs] = useState<DBProblem[]>([]);
+
+  useEffect(() => {
+    const getProblems = async () => {
+      setLoading(true);
+
+      const q = query(
+        collection(firestore, "problems"),
+        orderBy("order", "asc")
+      );
+
+      const temp: DBProblem[] = [];
+
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        temp.push({ id: doc.id, ...doc.data() } as DBProblem);
+      });
+      setProbs(temp);
+      setLoading(false);
+    };
+    getProblems();
+  }, [setLoading]);
+
+  return probs;
+}
