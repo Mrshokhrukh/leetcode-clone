@@ -25,7 +25,7 @@ const ProblemDescription: React.FC<Props> = ({ problem }) => {
 
   const handleLike = async () => {
     if (!user) {
-      toast.error("please Login first", { theme: "dark" });
+      alert("please Login first");
       return;
     }
   };
