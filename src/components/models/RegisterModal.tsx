@@ -1,9 +1,10 @@
 import { authModalState } from "@/app/recoilContextProvider/RecoilContextProvider";
 import { set } from "firebase/database";
 import Link from "next/link";
+import { doc, setDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import { useSetRecoilState } from "recoil";
-import { auth } from "@/firebase/firebase";
+import { auth, firestore } from "@/firebase/firebase";
 import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -28,6 +29,10 @@ function RegisterModal({}: Props) {
     if (!inputs.email && !inputs.password && !inputs.name)
       return alert("please fill");
     try {
+      toast.loading("Registering...", {
+        position: "top-center",
+        toastId: "loadingToast",
+      });
       const newUser = await createUserWithEmailAndPassword(
         inputs.email,
         inputs.password
@@ -35,6 +40,18 @@ function RegisterModal({}: Props) {
       if (!newUser) {
         return;
       }
+      const userData = {
+        uid: newUser.user.uid,
+        email: newUser.user.email,
+        name: inputs.name,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+        likedProblems: [],
+        dislikedProblems: [],
+        solvedProblems: [],
+        starredProblems: [],
+      };
+      await setDoc(doc(firestore, "users", newUser.user.uid), userData);
       toast.success("Registered successfully", {
         position: "top-center",
         autoClose: 3000,
@@ -44,6 +61,8 @@ function RegisterModal({}: Props) {
       setInputs({ email: "", name: "", password: "" });
     } catch (error: any) {
       console.log(error);
+    } finally {
+      toast.dismiss("loadingToast");
     }
   };
 

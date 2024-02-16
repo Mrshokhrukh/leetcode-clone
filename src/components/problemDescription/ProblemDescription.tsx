@@ -1,14 +1,20 @@
-import { Problem } from "@/utils/problems/types/types";
-import React from "react";
+import { DBProblem, Problem } from "@/utils/problems/types/types";
+import React, { useEffect, useState } from "react";
 import { AiFillDislike, AiFillLike } from "react-icons/ai";
 import { BsCheck2Circle } from "react-icons/bs";
 import { TiStarOutline } from "react-icons/ti";
-
+import { doc, getDoc } from "firebase/firestore";
+import { firestore } from "@/firebase/firebase";
+import RectangleSkeleton from "../skeletons/RectangleSkeleton";
+import CircleSkeleton from "../skeletons/CircleSkeleton";
 type Props = {
   problem: Problem;
 };
 
 const ProblemDescription: React.FC<Props> = ({ problem }) => {
+  const { currProblem, loading, probDifficultyClass } = useGetCurrentProblem(
+    problem?.id
+  );
   return (
     <div className="bg-dark-layer-1">
       <div className="flex h-11 w-full items-center pt-2 bg-dark-layer-2 text-white overflow-x-hidden">
@@ -29,26 +35,38 @@ const ProblemDescription: React.FC<Props> = ({ problem }) => {
             </div>
 
             <div className="flex items-center mt-3">
-              <div
-                className={`text-olive bg-olive inline-block rounded-[21px] bg-opacity-[.15] px-2.5 py-1 text-xs font-medium capitalize`}
-              >
-                Easy
-              </div>
+              {!loading && currProblem && (
+                <div
+                  className={`${probDifficultyClass} inline-block rounded-[21px] bg-opacity-[.15] px-2.5 py-1 text-xs font-medium capitalize`}
+                >
+                  {currProblem?.difficulty}
+                </div>
+              )}
               <div className="rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s">
                 <BsCheck2Circle />
               </div>
               <div className="flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-dark-gray-6">
                 <AiFillLike />
-                <span className="text-xs">120</span>
+                <span className="text-xs">{currProblem?.likes}</span>
               </div>
               <div className="flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-gray-6">
                 <AiFillDislike />
-                <span className="text-xs">2</span>
+                <span className="text-xs">{currProblem?.dislikes}</span>
               </div>
               <div className="cursor-pointer hover:bg-dark-fill-3 rounded p-[3px] ml-4 text-xl transition-colors duration-200 text-green-s text-dark-gray-6">
                 <TiStarOutline />
               </div>
             </div>
+            { loading && (
+              <div className="mt-3 flex space-x-2">
+                <RectangleSkeleton />
+                <CircleSkeleton />
+                <RectangleSkeleton />
+                <RectangleSkeleton />
+                <CircleSkeleton />
+              </div>
+            )}
+
             {/* {'problem title para'} */}
             <div className="text-white text-sm">
               <div
@@ -105,3 +123,37 @@ const ProblemDescription: React.FC<Props> = ({ problem }) => {
 };
 
 export default ProblemDescription;
+
+export function useGetCurrentProblem(problemId: string) {
+  const [currProblem, setCurrProblem] = useState<DBProblem | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [probDifficultyClass, setProbDifficultyClass] = useState("");
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      if (problemId) {
+        const docRef = doc(firestore, "problems", problemId);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          let pr = docSnap.data();
+          setCurrProblem({ id: docSnap.id, ...pr } as DBProblem);
+
+          setProbDifficultyClass(
+            pr.difficulty === "Easy"
+              ? "bg-olive text-olive"
+              : pr.difficulty === "Medium"
+              ? "bg-dark-yellow text-dark-yellow"
+              : "bg-dark-pink text-dark-pink"
+          );
+        }
+      }
+
+      setLoading(false);
+    };
+    fetchData();
+  }, [problemId]);
+
+  return { currProblem, loading, probDifficultyClass };
+}
+

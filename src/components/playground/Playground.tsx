@@ -50,25 +50,23 @@ const Playground: React.FC<Props> = ({ problem }) => {
           <div className="flex">
             {problem?.examples.map((ex, i) => {
               return (
-                <>
-                  <div
-                    className="mr-2 item-start mt-2 text-white"
-                    key={i}
-                    onClick={() => setActiveTestCase(i)}
-                  >
-                    <div className="flex flex-wrap items-center gap-y-4">
-                      <div
-                        className={`font-medium items-center transition-all focus:outline-none inline-flex bg-dark-fill-3 hover:bg-dark-fill-2 relative rounded-lg px-4 py-1 cursor-pointer whitespace-nowrap
+                <div
+                  className="mr-2 item-start mt-2 text-white"
+                  key={i}
+                  onClick={() => setActiveTestCase(i)}
+                >
+                  <div className="flex flex-wrap items-center gap-y-4">
+                    <div
+                      className={`font-medium items-center transition-all focus:outline-none inline-flex bg-dark-fill-3 hover:bg-dark-fill-2 relative rounded-lg px-4 py-1 cursor-pointer whitespace-nowrap
                         ${
                           activeTestCase === i ? "text-white" : "text-gray-400"
                         } 
                         `}
-                      >
-                        Case {i + 1}
-                      </div>
+                    >
+                      Case {i + 1}
                     </div>
                   </div>
-                </>
+                </div>
               );
             })}
           </div>
@@ -85,6 +83,7 @@ const Playground: React.FC<Props> = ({ problem }) => {
           </div>
         </div>
       </Split>
+
       <EditorFooter />
     </div>
   );
