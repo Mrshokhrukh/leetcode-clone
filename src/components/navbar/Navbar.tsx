@@ -22,6 +22,10 @@ function Navbar({ problemPage }: Props) {
     setAuthModalState((prev) => ({ ...prev, isOpen: true, type: "login" }));
   };
 
+  const handleProblemChange = (isForward: boolean) => {
+    
+  };
+
   return (
     <nav className="relative flex h-[50px] w-full shrink-0 items-center px-5 bg-dark-layer-1 text-dark-gray-7 ">
       <div

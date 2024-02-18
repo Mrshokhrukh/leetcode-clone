@@ -102,12 +102,12 @@ const ProblemDescription: React.FC<Props> = ({ problem }) => {
       if (userDoc.exists() && probDoc.exists()) {
         if (disliked) {
           transaction.update(userRef, {
-            likedProblems: userDoc
+            dislikedProblems: userDoc
               .data()
-              .likedProblems.filter((id: string) => id !== problem.id),
+              .dislikedProblems.filter((id: string) => id !== problem.id),
           });
           transaction.update(probRef, {
-            likes: probDoc.data().dislikes - 1,
+            dislikes: probDoc.data().dislikes - 1,
           });
 
           setCurrProblem((prev) =>
@@ -183,9 +183,12 @@ const ProblemDescription: React.FC<Props> = ({ problem }) => {
                   {currProblem?.difficulty}
                 </div>
 
-                <div className="rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s">
-                  <BsCheck2Circle />
-                </div>
+                {solved && (
+                  <div className="rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-green-s">
+                    <BsCheck2Circle />
+                  </div>
+                )}
+
                 <div
                   className="flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-dark-gray-6"
                   onClick={handleLike}
@@ -198,8 +201,8 @@ const ProblemDescription: React.FC<Props> = ({ problem }) => {
                   className="flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-gray-6"
                   onClick={handleDislike}
                 >
-                  {!disliked && <AiFillDislike className="text-dark-blue-s" />}
-                  {disliked && <AiFillDislike />}
+                  {disliked && <AiFillDislike className="text-dark-blue-s" />}
+                  {!disliked && <AiFillDislike />}
                   <span className="text-xs">{currProblem?.dislikes}</span>
                 </div>
                 <div className="cursor-pointer hover:bg-dark-fill-3 rounded p-[3px] ml-4 text-xl transition-colors duration-200 text-green-s text-dark-gray-6">
