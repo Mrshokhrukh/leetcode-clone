@@ -6,17 +6,51 @@ import { javascript } from "@codemirror/lang-javascript";
 import Split from "react-split";
 import EditorFooter from "./EditorFooter";
 import { Problem } from "@/utils/problems/types/types";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "@/firebase/firebase";
+import { toast } from "react-toastify";
+import { problems } from "@/utils/problems";
+import { usePathname } from "next/navigation";
 
 interface Props {
   problem: Problem;
+  setSuccess: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const Playground: React.FC<Props> = ({ problem }) => {
+const Playground: React.FC<Props> = ({ problem, setSuccess }) => {
   const [activeTestCase, setActiveTestCase] = useState<number>(0);
-
+  const [userCode, setUserCode] = useState<string>(problem?.starterCode);
+  const [user] = useAuthState(auth);
+  let pathname = usePathname();
   const boilerPlate = `function twoSum(nums, target){
    // write your code here
 };`;
+
+  const handleSubmit = () => {
+    if (!user) {
+      alert("please login");
+      return;
+    }
+    try {
+      const cb = new Function(`return ${userCode}`)();
+      let pid = pathname.slice(10, pathname.length);
+      console.log(pid);
+      const success = problems[pid].handlerFunction(cb);
+      console.log(pid);
+      if (success) {
+        alert("all tests passed");
+        setSuccess(true);
+        setTimeout(() => {
+          setSuccess(false);
+        }, 4000);
+      }
+    } catch (error) {
+      alert("error");
+    }
+  };
+  const handleChange = (value: string) => {
+    setUserCode(value);
+  };
 
   return (
     <div className="flex flex-col bg-dark-layer-1 relative">
@@ -32,6 +66,7 @@ const Playground: React.FC<Props> = ({ problem }) => {
           <ReactCodeMirror
             value={boilerPlate}
             theme={vscodeDark}
+            onChange={handleChange}
             extensions={[javascript()]}
             style={{ fontSize: 16 }}
           />
@@ -84,7 +119,7 @@ const Playground: React.FC<Props> = ({ problem }) => {
         </div>
       </Split>
 
-      <EditorFooter />
+      <EditorFooter handleSubmit={handleSubmit} />
     </div>
   );
 };
