@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { AiFillDislike, AiFillLike } from "react-icons/ai";
 import { BsCheck2Circle } from "react-icons/bs";
 import { TiStarOutline } from "react-icons/ti";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, runTransaction } from "firebase/firestore";
 import { auth, firestore } from "@/firebase/firebase";
 import RectangleSkeleton from "../skeletons/RectangleSkeleton";
 import CircleSkeleton from "../skeletons/CircleSkeleton";
@@ -15,19 +15,145 @@ type Props = {
 
 const ProblemDescription: React.FC<Props> = ({ problem }) => {
   const [user] = useAuthState(auth);
-  const { currProblem, loading, probDifficultyClass } = useGetCurrentProblem(
-    problem?.id
-  );
+  const { currProblem, loading, probDifficultyClass, setCurrProblem } =
+    useGetCurrentProblem(problem?.id);
 
-  const { liked, disliked, starred, solved } = useGetUsersDataOnProblem(
-    problem?.id
-  );
+  const { liked, disliked, starred, solved, setData } =
+    useGetUsersDataOnProblem(problem?.id);
 
   const handleLike = async () => {
     if (!user) {
       alert("please Login first");
       return;
     }
+
+    await runTransaction(firestore, async (transaction) => {
+      const userRef = doc(firestore, "users", user.uid);
+      const probRef = doc(firestore, "problems", problem.id);
+      const userDoc = await transaction.get(userRef);
+      const probDoc = await transaction.get(probRef);
+      if (userDoc.exists() && probDoc.exists()) {
+        if (liked) {
+          transaction.update(userRef, {
+            likedProblems: userDoc
+              .data()
+              .likedProblems.filter((id: string) => id !== problem.id),
+          });
+          transaction.update(probRef, {
+            likes: probDoc.data().likes - 1,
+          });
+
+          setCurrProblem((prev) =>
+            prev ? { ...prev, likes: prev?.likes - 1 } : null
+          );
+          setData((prev) => ({ ...prev, liked: false }));
+        } else if (disliked) {
+          transaction.update(userRef, {
+            likedProblems: [...userDoc.data().likedProblems, problem.id],
+            dislikedProblems: userDoc
+              .data()
+              .dislikedProblems.filter((id: string) => id !== problem.id),
+          });
+          transaction.update(probRef, {
+            likes: probDoc.data().likes + 1,
+            dislikes: probDoc.data().dislikes - 1,
+          });
+          setCurrProblem((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  likes: prev?.likes + 1,
+                  dislikes: prev?.dislikes - 1,
+                }
+              : null
+          );
+          setData((prev) => ({ ...prev, liked: true, disliked: false }));
+        } else {
+          transaction.update(userRef, {
+            likedProblems: [...userDoc.data().likedProblems, problem.id],
+          });
+          transaction.update(probRef, {
+            likes: userDoc.data().likes + 1,
+          });
+          setCurrProblem((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  likes: prev?.likes + 1,
+                }
+              : null
+          );
+          setData((prev) => ({ ...prev, liked: true }));
+        }
+      }
+    });
+  };
+
+  const handleDislike = async () => {
+    if (!user) {
+      alert("please Login first");
+      return;
+    }
+    await runTransaction(firestore, async (transaction) => {
+      const userRef = doc(firestore, "users", user.uid);
+      const probRef = doc(firestore, "problems", problem.id);
+      const userDoc = await transaction.get(userRef);
+      const probDoc = await transaction.get(probRef);
+      if (userDoc.exists() && probDoc.exists()) {
+        if (disliked) {
+          transaction.update(userRef, {
+            likedProblems: userDoc
+              .data()
+              .likedProblems.filter((id: string) => id !== problem.id),
+          });
+          transaction.update(probRef, {
+            likes: probDoc.data().dislikes - 1,
+          });
+
+          setCurrProblem((prev) =>
+            prev ? { ...prev, dislikes: prev?.dislikes - 1 } : null
+          );
+          setData((prev) => ({ ...prev, disliked: false }));
+        } else if (liked) {
+          transaction.update(userRef, {
+            dislikedProblems: [...userDoc.data().dislikedProblems, problem.id],
+            likedProblems: userDoc
+              .data()
+              .likedProblems.filter((id: string) => id !== problem.id),
+          });
+          transaction.update(probRef, {
+            likes: probDoc.data().dislikes + 1,
+            dislikes: probDoc.data().likes - 1,
+          });
+          setCurrProblem((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  likes: prev?.dislikes + 1,
+                  dislikes: prev?.likes - 1,
+                }
+              : null
+          );
+          setData((prev) => ({ ...prev, liked: false, disliked: true }));
+        } else {
+          transaction.update(userRef, {
+            disLikedProblems: [...userDoc.data().dislikedProblems, problem.id],
+          });
+          transaction.update(probRef, {
+            dislikes: userDoc.data().dislikes + 1,
+          });
+          setCurrProblem((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  dislikes: prev?.dislikes + 1,
+                }
+              : null
+          );
+          setData((prev) => ({ ...prev, disliked: true }));
+        }
+      }
+    });
   };
 
   return (
@@ -68,8 +194,12 @@ const ProblemDescription: React.FC<Props> = ({ problem }) => {
                   {!liked && <AiFillLike />}
                   <span className="text-xs">{currProblem?.likes}</span>
                 </div>
-                <div className="flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-gray-6">
-                  <AiFillDislike />
+                <div
+                  className="flex items-center cursor-pointer hover:bg-dark-fill-3 space-x-1 rounded p-[3px] ml-4 text-lg transition-colors duration-200 text-green-s text-dark-gray-6"
+                  onClick={handleDislike}
+                >
+                  {!disliked && <AiFillDislike className="text-dark-blue-s" />}
+                  {disliked && <AiFillDislike />}
                   <span className="text-xs">{currProblem?.dislikes}</span>
                 </div>
                 <div className="cursor-pointer hover:bg-dark-fill-3 rounded p-[3px] ml-4 text-xl transition-colors duration-200 text-green-s text-dark-gray-6">
@@ -174,7 +304,7 @@ export function useGetCurrentProblem(problemId: string) {
     fetchData();
   }, [problemId]);
 
-  return { currProblem, loading, probDifficultyClass };
+  return { currProblem, loading, probDifficultyClass, setCurrProblem };
 }
 
 export function useGetUsersDataOnProblem(id: string) {
