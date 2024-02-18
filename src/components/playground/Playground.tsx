@@ -32,11 +32,11 @@ const Playground: React.FC<Props> = ({ problem, setSuccess }) => {
       return;
     }
     try {
-      const cb = new Function(`return ${userCode}`)();
+      const cb = new Function(`return ${userCode}`);
       let pid = pathname.slice(10, pathname.length);
-      console.log(pid);
+
       const success = problems[pid].handlerFunction(cb);
-      console.log(pid);
+
       if (success) {
         alert("all tests passed");
         setSuccess(true);
