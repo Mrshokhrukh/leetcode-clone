@@ -1,11 +1,17 @@
 "use client";
 import Navbar from "@/components/navbar/Navbar";
 import TableProblems from "@/components/problemsTable/TableProblems";
+import useHasMounted from "@/hooks/useHasMounted";
 import Image from "next/image";
 import { useState } from "react";
 export default function Home() {
   const [loading, setLoading] = useState(true);
+  const hasMounted = useHasMounted();
 
+  
+  if (!hasMounted) return null;
+
+  
   return (
     <div className="bg-dark-layer-2 min-h-screen">
       <Navbar />
@@ -42,7 +48,7 @@ export default function Home() {
               </tr>
             </thead>
           )}
-          <TableProblems setLoading={setLoading}/>
+          <TableProblems setLoading={setLoading} />
         </table>
       </div>
     </div>

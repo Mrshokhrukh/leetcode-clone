@@ -9,6 +9,9 @@ import { authModalState } from "@/app/recoilContextProvider/RecoilContextProvide
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { BsList } from "react-icons/bs";
 import Timer from "../Timer/Timer";
+import { useRouter, usePathname } from "next/navigation";
+import { problems } from "@/utils/problems";
+import { Problem } from "@/utils/problems/types/types";
 
 type Props = {
   problemPage?: boolean;
@@ -17,13 +20,34 @@ type Props = {
 function Navbar({ problemPage }: Props) {
   const [user] = useAuthState(auth);
   const setAuthModalState = useSetRecoilState(authModalState);
-
+  const router = useRouter();
+  const pathname = usePathname();
   const handleClick = () => {
     setAuthModalState((prev) => ({ ...prev, isOpen: true, type: "login" }));
   };
 
   const handleProblemChange = (isForward: boolean) => {
+    let id = pathname.slice(10, pathname.length);
+    const { order } = problems[id as string] as Problem;
+    const diraction = isForward ? 1 : -1;
+    const nextProb = order + diraction;
+    const nextProbKey = Object.keys(problems).find((key) => {
+      return problems[key].order === nextProb;
+    });
     
+    if (isForward && !nextProbKey) {
+      const firstProbKey = Object.keys(problems).find((key) => {
+        return problems[key].order === 1;
+      });
+      router.push(`/problems/${firstProbKey}`);
+    } else if (!isForward && !nextProbKey) {
+      const lastProbKey = Object.keys(problems).find((key) => {
+        return problems[key].order === Object.keys(problems).length;
+      });
+      router.push(`/problems/${lastProbKey}`);
+    } else {
+      router.push(`/problems/${nextProbKey}`);
+    }
   };
 
   return (
@@ -39,7 +63,10 @@ function Navbar({ problemPage }: Props) {
 
         {problemPage && (
           <div className="flex item-center gap-4 flex-1 justify center">
-            <div className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer">
+            <div
+              className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer"
+              onClick={() => handleProblemChange(false)}
+            >
               <FaChevronLeft />
             </div>
             <Link
@@ -52,7 +79,10 @@ function Navbar({ problemPage }: Props) {
               <p>ProblemList</p>
             </Link>
 
-            <div className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer">
+            <div
+              className="flex items-center justify-center rounded bg-dark-fill-3 hover:bg-dark-fill-2 h-8 w-8 cursor-pointer"
+              onClick={() => handleProblemChange(true)}
+            >
               <FaChevronRight />
             </div>
           </div>
