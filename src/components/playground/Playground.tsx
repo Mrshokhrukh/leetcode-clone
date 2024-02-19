@@ -27,26 +27,30 @@ const Playground: React.FC<Props> = ({ problem, setSuccess }) => {
 };`;
 
   const handleSubmit = () => {
+    setSuccess(true);
+    setTimeout(() => {
+      setSuccess(false);
+    }, 4000);
     if (!user) {
       alert("please login");
       return;
     }
-    try {
-      const cb = new Function(`return ${userCode}`);
-      let pid = pathname.slice(10, pathname.length);
+    // try {
+    //   const cb = new Function(`return ${userCode}`);
+    //   let pid = pathname.slice(10, pathname.length);
 
-      const success = problems[pid].handlerFunction(cb);
+    //   const success = problems[pid].handlerFunction(cb);
 
-      if (success) {
-        alert("all tests passed");
-        setSuccess(true);
-        setTimeout(() => {
-          setSuccess(false);
-        }, 4000);
-      }
-    } catch (error) {
-      alert("error");
-    }
+    //   if (success) {
+    //     alert("all tests passed");
+    //     setSuccess(true);
+    //     setTimeout(() => {
+    //       setSuccess(false);
+    //     }, 4000);
+    //   }
+    // } catch (error) {
+    //   alert("error");
+    // }
   };
   const handleChange = (value: string) => {
     setUserCode(value);

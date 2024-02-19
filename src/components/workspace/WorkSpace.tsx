@@ -15,11 +15,12 @@ type Props = {
 const WorkSpace: React.FC<Props> = ({ problem }) => {
   const { width, height } = useWindowSize();
   const [success, setSuccess] = useState(false);
+
   return (
     <Split className="split">
       <ProblemDescription problem={problem} />
       <div className="bg-dark-fill-2">
-        <Playground problem={problem} setSuccess={setSuccess}/>
+        <Playground problem={problem} setSuccess={setSuccess} />
         {success && (
           <Confetti
             gravity={0.3}
