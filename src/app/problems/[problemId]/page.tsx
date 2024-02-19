@@ -7,11 +7,10 @@ import { Problem } from "@/utils/problems/types/types";
 import { useEffect, useState } from "react";
 
 type Props = {
-  problem: Problem;
   params: { problemId: string };
 };
 
-const ProblemPage: React.FC<Props> = ({ problem, params }) => {
+const ProblemPage: React.FC<Props> = ({ params }) => {
   const [currentProblem, setProblem] = useState<Problem | null>(null);
 
   useEffect(() => {
@@ -19,7 +18,6 @@ const ProblemPage: React.FC<Props> = ({ problem, params }) => {
       const { problemId } = params;
       const problemData = problems[problemId];
       if (!problemData) {
-        // Handle not found
         return;
       }
 
@@ -37,19 +35,6 @@ const ProblemPage: React.FC<Props> = ({ problem, params }) => {
     </div>
   );
 };
-
-export async function getStaticPaths() {
-  const paths = Object.keys(problems).map((key) => ({
-    params: {
-      problemId: key,
-    },
-  }));
-
-  return {
-    paths,
-    fallback: false,
-  };
-}
 
 // export async function getStaticProps({
 //   params,
