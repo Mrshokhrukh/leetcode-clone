@@ -11,7 +11,7 @@ type Props = {
 };
 
 const ProblemPage: React.FC<Props> = ({ params }) => {
-  const [currentProblem, setProblem] = useState<Problem | null>(null);
+  const [currentProblem, setProblem] = useState<Problem>();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,11 +27,17 @@ const ProblemPage: React.FC<Props> = ({ params }) => {
 
     fetchData();
   }, [currentProblem]);
-
+  if (currentProblem) {
+    return (
+      <div>
+        <Navbar problemPage />
+        <WorkSpace problem={currentProblem} />
+      </div>
+    );
+  }
   return (
     <div>
       <Navbar problemPage />
-      <WorkSpace problem={currentProblem} />
     </div>
   );
 };
