@@ -1,27 +1,20 @@
 "use client";
 import Navbar from "@/components/navbar/Navbar";
 import TableProblems from "@/components/problemsTable/TableProblems";
-import useHasMounted from "@/hooks/useHasMounted";
-import Image from "next/image";
 import { useState } from "react";
 export default function Home() {
   const [loading, setLoading] = useState(true);
-  const hasMounted = useHasMounted();
 
-  
-  if (!hasMounted) return null;
-
-  
   return (
     <div className="bg-dark-layer-2 min-h-screen">
       <Navbar />
       <h1 className="text-2xl text-center text-gray-700 dark:text-gray-400 font-medium uppercase mt-10 mb-5">
-        " QUALITY OVER QUANTITIY " 👇
+        QUALITY OVER QUANTITIY {`👇`}
       </h1>
       <div className="relative overflow-x-auto mx-auto px-6 pb-10">
         {loading && (
           <div className="max-w-[1200px] mx-auto sm:w-7/12 w-full animate-pulse">
-            {[...Array(10)].map((v, i) => {
+            {[...Array(10)].map((_, i) => {
               return <LoadingSkeleton key={i} />;
             })}
           </div>

@@ -12,14 +12,10 @@ type Props = {};
 function Authpage({}: Props) {
   let router = useRouter();
   const authModal = useRecoilValue(authModalState);
-  const [isLoading, setIsloading] = useState(true);
-  const [user, loading, error] = useAuthState(auth);
+  const [user] = useAuthState(auth);
   useEffect(() => {
     if (user) router.push("/");
-    if (!loading && !user) {
-      setIsloading(false);
-    }
-  }, [user, router]);
+  }, [user]);
 
   // if (isLoading) {
   //   return null;
